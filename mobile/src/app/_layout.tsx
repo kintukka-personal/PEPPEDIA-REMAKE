@@ -10,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AUTO_SYNC_MS, shouldAutoSync, syncHealth } from '@/features/health/sync';
 import { healthSupported } from '@/lib/health';
 import { remindersSupported, syncReminders } from '@/lib/notifications';
+import { handleReminderAction } from '@/lib/reminder-actions';
 import { useStore } from '@/store';
 import { dailySnapshot } from '@/store/backup';
 import { ThemeProvider, useTheme } from '@/ui/theme';
@@ -40,6 +41,11 @@ function ReminderSync() {
   useEffect(() => {
     if (!remindersSupported) return;
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      // Log/Skip buttons record the dose in place; only a tap on the body opens the Log screen.
+      if (response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) {
+        handleReminderAction(response).catch(() => {});
+        return;
+      }
       const data = response.notification.request.content.data as { protocolId?: string; scheduledFor?: string };
       if (data?.protocolId) router.push({ pathname: '/log', params: { protocolId: data.protocolId, scheduledFor: data.scheduledFor ?? '' } });
     });

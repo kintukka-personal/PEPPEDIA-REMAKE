@@ -10,6 +10,8 @@ import { AndroidImportance } from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import { reminderBody } from '@/domain/draw';
+import { ACTION_LOG, ACTION_SKIP, REMINDER_CATEGORY } from '@/lib/reminder-actions';
+import { REMINDER_TASK } from '@/lib/reminder-task';
 import type { DoseLog, InventoryItem, Protocol, SyringeId } from '@/domain/model';
 import { agendaForDay, occurrences } from '@/domain/schedule';
 
@@ -36,6 +38,13 @@ export async function configureNotifications(): Promise<void> {
     name: 'Dose reminders',
     importance: AndroidImportance.HIGH,
   });
+  // Buttons on each reminder. They don't open the app: the press is handled in
+  // the background (see reminder-actions.ts) and the notification dismissed.
+  await Notifications.setNotificationCategoryAsync(REMINDER_CATEGORY, [
+    { identifier: ACTION_LOG, buttonTitle: 'Log', options: { opensAppToForeground: false } },
+    { identifier: ACTION_SKIP, buttonTitle: 'Skip', options: { opensAppToForeground: false } },
+  ]);
+  await Notifications.registerTaskAsync(REMINDER_TASK).catch(() => {});
 }
 
 export async function requestReminderPermission(): Promise<boolean> {
@@ -79,6 +88,7 @@ export async function syncReminders(protocols: Protocol[], logs: DoseLog[], enab
         title: `${p.name} due`,
         body: reminderBody(p, at, inventory, defaultSyringe),
         data: { protocolId: p.id, scheduledFor: at.toISOString() },
+        categoryIdentifier: REMINDER_CATEGORY,
       },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at, channelId: CHANNEL },
     });

@@ -125,7 +125,7 @@ describe('reminder text', () => {
       createdAt: '',
       mix: powder(50, 5),
     };
-    expect(reminderBody(p, new Date('2026-10-24T19:00:00'), [], 'u100-100')).toBe('1 mg · 10 units (0.1 mL) · SubQ. Tap to log it.');
-    expect(reminderBody({ ...p, mix: undefined }, new Date('2026-10-24T19:00:00'), [], 'u100-100')).toBe('1 mg · SubQ. Tap to log it.');
+    expect(reminderBody(p, new Date('2026-10-24T19:00:00'), [], 'u100-100')).toBe('1 mg · 10 units (0.1 mL) · SubQ');
+    expect(reminderBody({ ...p, mix: undefined }, new Date('2026-10-24T19:00:00'), [], 'u100-100')).toBe('1 mg · SubQ');
   });
 });
