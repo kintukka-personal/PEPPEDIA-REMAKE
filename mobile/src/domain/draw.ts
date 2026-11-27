@@ -103,9 +103,9 @@ export function drawText(d: Pick<DoseDraw, 'units' | 'volumeMl' | 'syringe'>): s
   return SYRINGES[d.syringe].scale === 'units' ? `${units} (${trim(d.volumeMl, 3)} mL)` : `${trim(d.volumeMl, 2)} mL (${units})`;
 }
 
-/** Reminder text: "1 mg · 10 units (0.1 mL) · SubQ. Tap to log it." The draw is included when the vial is known. */
+/** Reminder text: "1 mg · 10 units (0.1 mL) · SubQ". The draw is included when the vial is known. */
 export function reminderBody(p: Protocol, at: Date, inventory: InventoryItem[], defaultSyringe: SyringeId): string {
   const dose = doseOn(p, at);
   const draw = drawForProtocol(p, dose, inventory, defaultSyringe);
-  return `${formatAmount(dose, true)}${draw ? ` · ${drawText(draw)}` : ''} · ${ROUTE_SHORT[p.route]}. Tap to log it.`;
+  return `${formatAmount(dose, true)}${draw ? ` · ${drawText(draw)}` : ''} · ${ROUTE_SHORT[p.route]}`;
 }
